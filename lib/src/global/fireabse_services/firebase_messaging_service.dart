@@ -3,6 +3,9 @@ import 'dart:convert';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:get/get.dart';
+
+import '../../routes/app_pages.dart';
 
 FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
@@ -20,7 +23,7 @@ AndroidNotificationChannel channel = AndroidNotificationChannel(
   enableVibration: true,
 );
 
-class FireBaseMessagingService {
+class FireBaseMessagingService extends GetxService {
   Future<FireBaseMessagingService> init() async {
     FirebaseMessaging.instance
         .requestPermission(sound: true, badge: true, alert: true);
@@ -45,16 +48,16 @@ class FireBaseMessagingService {
         await FirebaseMessaging.instance.getInitialMessage();
     if (message != null && message.data.toString().trim() != "") {
       print("Intialize Message   ${message.data}");
-      _handleNotification(message.data);
+      moveScreen(jsonEncode(message.data).toString());
     }
   }
 
   // app in background and call click on the notification
   Future fcmOnResumeListeners() async {
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      print("App Message Oppened  ${message.data}");
+      print("App Message Oppened  ${message.data["path"]}");
       print("NotificationDialog   $message");
-      _handleNotification(message.data);
+      moveScreen(jsonEncode(message.data).toString());
     });
   }
 
@@ -85,20 +88,26 @@ class FireBaseMessagingService {
         payload: jsonEncode(message.data));
   }
 
-  Future<void> _handleNotification(Map<String, dynamic> message) async {
-    var jsonencoded = jsonDecode(message["data"].toString());
-    debugPrint(jsonencoded.toString());
-  }
-
   Future onDidReceiveLocalNotification(
       dynamic id, dynamic title, dynamic body, dynamic payload) async {
     debugPrint("received tapped kill" + payload.toString());
+    moveScreen(payload.toString());
   }
 
   // application is open and click on the notification
   // on select notifiction
   Future onSelectNotification(NotificationResponse notificationResponse) async {
     debugPrint("select tapped kill" + notificationResponse.payload.toString());
+    moveScreen(notificationResponse.payload.toString());
+  }
+
+  void moveScreen(String json) {
+    var jsonencoded = jsonDecode(json);
+    if (jsonencoded["path"].toString() == "login") {
+      Get.toNamed(Routes.screen_two);
+    } else {
+      Get.toNamed(Routes.screen_three);
+    }
   }
 
   void initializeNotificationSetting() {

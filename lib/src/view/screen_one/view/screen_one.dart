@@ -1,39 +1,23 @@
-import 'dart:collection';
-
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_state_manager/src/simple/get_view.dart';
 
-import '../main.dart';
-import 'gloable/constant_variable.dart';
+import '../../../global/fireabse_services/firebase_analytics.dart';
+import '../../../global/fireabse_services/firebase_dynamic_links.dart';
+import '../../../routes/app_pages.dart';
+import '../controller/screen_one_controller.dart';
 
-class UIDemo extends StatefulWidget {
-  const UIDemo({Key? key}) : super(key: key);
-
-  @override
-  State<UIDemo> createState() => _UIDemoState();
-}
-
-class _UIDemoState extends State<UIDemo> {
-  late Future<void> _initializeFlutterFireFuture;
-
-  Future<void> _initializeFlutterFire() async {
-    if (kTestingCrashlytics) {
-      await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
-    } else {
-      await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(false);
-    }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _initializeFlutterFireFuture = _initializeFlutterFire();
-  }
+class ScreenOne extends GetView<ScreenOneController> {
+  ScreenOne({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text("Screen One"),
+      ),
       body: SafeArea(
         child: Container(
           margin: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
@@ -42,6 +26,12 @@ class _UIDemoState extends State<UIDemo> {
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               getAppBar(),
+              getButton(),
+              ElevatedButton(
+                  onPressed: () {
+                    FirebaseDynamic().createDynamicLink(true);
+                  },
+                  child: Text("Generate Dynamic link"))
             ],
           ),
         ),
@@ -76,6 +66,41 @@ class _UIDemoState extends State<UIDemo> {
                       _sendAnalyticsEvent();
                     },
                     child: Text("Analytics Test")),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget getButton() {
+    return Container(
+      child: Card(
+        elevation: 4.0,
+        child: Container(
+          padding: EdgeInsets.all(10),
+          decoration: BoxDecoration(
+              color: Colors.white,
+              boxShadow: [BoxShadow(blurRadius: 0.0)],
+              borderRadius: BorderRadius.all(Radius.circular(2))),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                child: ElevatedButton(
+                    onPressed: () {
+                      Get.toNamed(Routes.screen_two);
+                    },
+                    child: Text("Second Screen")),
+              ),
+              Spacer(),
+              Container(
+                child: ElevatedButton(
+                    onPressed: () {
+                      Get.toNamed(Routes.screen_three);
+                    },
+                    child: Text("Screen Three")),
               ),
             ],
           ),

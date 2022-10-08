@@ -45,7 +45,7 @@
                 <data
                     android:host="app.demo.com"
                     android:pathPrefix=""
-                    android:scheme="demo"
+                    android:scheme="http"
                     tools:ignore="AppLinkUrlError" />
             </intent-filter>
         </activity>
